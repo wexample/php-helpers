@@ -117,6 +117,10 @@ class ArrayHelper
         bool $allowEmptyMissing = false
     ): array
     {
+        // Sort orders.
+        $a = ArrayHelper::canonicalize($a);
+        $b = ArrayHelper::canonicalize($b);
+
         // If not allowing empty missing, nothing to normalize.
         if (!$allowEmptyMissing) {
             return [$a, $b];
