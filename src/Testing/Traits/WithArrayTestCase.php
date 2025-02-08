@@ -3,7 +3,7 @@
 namespace Wexample\Helpers\Testing\Traits;
 
 use SebastianBergmann\Diff\Differ;
-use Wexample\Pseudocode\Helper\ArrayHelper;
+use Wexample\Helpers\Helper\ArrayHelper;
 
 trait WithArrayTestCase
 {
@@ -30,8 +30,8 @@ trait WithArrayTestCase
             ArrayHelper::normalize($expected, $actual);
 
             // Canonicalize arrays to ignore order differences.
-            $canonicalExpected = \Wexample\Helpers\Helper\ArrayHelper::canonicalize($expected);
-            $canonicalActual = \Wexample\Helpers\Helper\ArrayHelper::canonicalize($actual);
+            $canonicalExpected = ArrayHelper::canonicalize($expected);
+            $canonicalActual = ArrayHelper::canonicalize($actual);
 
             if ($canonicalExpected !== $canonicalActual) {
                 // Convert canonical arrays to strings for diffing.
