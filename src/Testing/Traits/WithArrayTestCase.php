@@ -27,16 +27,12 @@ trait WithArrayTestCase
         // If there are any differences reported by the helper, generate a diff.
         if (!ArrayHelper::areSame($expected, $actual, $allowEmptyMissing)) {
             // Make ignored différences the same between two arrays.
-            ArrayHelper::normalize($expected, $actual);
+            ArrayHelper::normalize($expected, $actual, $allowEmptyMissing);
 
-            // Canonicalize arrays to ignore order differences.
-            $canonicalExpected = ArrayHelper::canonicalize($expected);
-            $canonicalActual = ArrayHelper::canonicalize($actual);
-
-            if ($canonicalExpected !== $canonicalActual) {
+            if ($expected !== $actual) {
                 // Convert canonical arrays to strings for diffing.
-                $expectedString = var_export($canonicalExpected, true);
-                $actualString = var_export($canonicalActual, true);
+                $expectedString = var_export($expected, true);
+                $actualString = var_export($actual, true);
 
                 $differ = new Differ();
                 $diff = $differ->diff($expectedString, $actualString);

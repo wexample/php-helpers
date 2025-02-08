@@ -117,39 +117,38 @@ class ArrayHelper
         bool $allowEmptyMissing = false
     ): array
     {
+        // If not allowing empty missing, nothing to normalize.
+        if ($allowEmptyMissing) {
+
+            // Normalize $a based on $b:
+            foreach ($b as $key => $value) {
+                if (!array_key_exists($key, $a)) {
+                    // If $b has an empty array at this key and $a is missing it, add it.
+                    if (is_array($value) && empty($value)) {
+                        $a[$key] = [];
+                    }
+                } else {
+                    // If both arrays have the key and both values are arrays, normalize them recursively.
+                    if (is_array($value) && is_array($a[$key])) {
+                        list($a[$key], $b[$key]) = self::normalize($a[$key], $value, $allowEmptyMissing);
+                    }
+                }
+            }
+
+            // Normalize $b based on $a:
+            foreach ($a as $key => $value) {
+                if (!array_key_exists($key, $b)) {
+                    // If $a has an empty array at this key and $b is missing it, add it.
+                    if (is_array($value) && empty($value)) {
+                        $b[$key] = [];
+                    }
+                }
+            }
+        }
+
         // Sort orders.
         $a = ArrayHelper::canonicalize($a);
         $b = ArrayHelper::canonicalize($b);
-
-        // If not allowing empty missing, nothing to normalize.
-        if (!$allowEmptyMissing) {
-            return [$a, $b];
-        }
-
-        // Normalize $a based on $b:
-        foreach ($b as $key => $value) {
-            if (!array_key_exists($key, $a)) {
-                // If $b has an empty array at this key and $a is missing it, add it.
-                if (is_array($value) && empty($value)) {
-                    $a[$key] = [];
-                }
-            } else {
-                // If both arrays have the key and both values are arrays, normalize them recursively.
-                if (is_array($value) && is_array($a[$key])) {
-                    list($a[$key], $b[$key]) = self::normalize($a[$key], $value, $allowEmptyMissing);
-                }
-            }
-        }
-
-        // Normalize $b based on $a:
-        foreach ($a as $key => $value) {
-            if (!array_key_exists($key, $b)) {
-                // If $a has an empty array at this key and $b is missing it, add it.
-                if (is_array($value) && empty($value)) {
-                    $b[$key] = [];
-                }
-            }
-        }
 
         return [$a, $b];
     }
