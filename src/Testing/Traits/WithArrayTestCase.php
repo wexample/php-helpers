@@ -25,8 +25,10 @@ trait WithArrayTestCase
     ): void
     {
         // If there are any differences reported by the helper, generate a diff.
-        $differences = ArrayHelper::diffArrays($expected, $actual, $allowEmptyMissing);
-        if (!empty($differences)) {
+        if (!ArrayHelper::areSame($expected, $actual, $allowEmptyMissing)) {
+            // Make ignored différences the same between two arrays.
+            ArrayHelper::normalize($expected, $actual);
+
             // Canonicalize arrays to ignore order differences.
             $canonicalExpected = \Wexample\Helpers\Helper\ArrayHelper::canonicalize($expected);
             $canonicalActual = \Wexample\Helpers\Helper\ArrayHelper::canonicalize($actual);
