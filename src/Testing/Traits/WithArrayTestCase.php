@@ -14,17 +14,18 @@ trait WithArrayTestCase
      * @param array $expected The expected array.
      * @param array $actual The actual array.
      * @param string $message Optional failure message.
-     *
+     * @param bool $allowEmptyMissing If true, a missing key paired with an empty array is ignored.
      * @return void
      */
     protected function assertArraysEqual(
         array $expected,
         array $actual,
-        string $message = ''
+        string $message = '',
+        bool $allowEmptyMissing = false
     ): void
     {
         // If there are any differences reported by the helper, generate a diff.
-        $differences = ArrayHelper::diffArrays($expected, $actual);
+        $differences = ArrayHelper::diffArrays($expected, $actual, $allowEmptyMissing);
         if (!empty($differences)) {
             // Canonicalize arrays to ignore order differences.
             $canonicalExpected = \Wexample\Helpers\Helper\ArrayHelper::canonicalize($expected);
