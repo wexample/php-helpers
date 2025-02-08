@@ -50,7 +50,8 @@ class PathHelper
         string $cousinBasePath,
         ?string $classSuffix = null,
         ?string $cousinSuffix = null,
-        ?string $separator = FileHelper::FOLDER_SEPARATOR
+        ?string $separator = FileHelper::FOLDER_SEPARATOR,
+        ?callable $transformer = null
     ): string
     {
         $parts = static::getPathParts(
@@ -59,14 +60,15 @@ class PathHelper
             offset: count(explode($separator, $sourceBasePath)) - 1
         );
 
+        if ($transformer !== null) {
+            $parts = array_map($transformer, $parts);
+        }
+
         $classBase = implode($separator, $parts);
 
-        // Remove suffix if exists.
-        $classBase = $classSuffix ? substr(
-            $classBase,
-            0,
-            -strlen($classSuffix)
-        ) : $classBase;
+        if ($classSuffix) {
+            $classBase = substr($classBase, 0, -strlen($classSuffix));
+        }
 
         return $cousinBasePath . $classBase . $cousinSuffix;
     }
