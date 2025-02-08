@@ -2,8 +2,8 @@
 
 namespace Wexample\Helpers\Class\Traits;
 
-use Wexample\SymfonyHelpers\Helper\ClassHelper;
-use Wexample\SymfonyHelpers\Helper\TextHelper;
+use Wexample\Helpers\Helper\ClassHelper;
+use Wexample\Helpers\Helper\TextHelper;
 
 trait HasShortClassNameClassTrait
 {
