@@ -13,7 +13,6 @@ use function implode;
 use function is_file;
 use function is_numeric;
 use function lcfirst;
-use function md5;
 use function mt_srand;
 use function number_format;
 use function openssl_encrypt;
@@ -29,7 +28,6 @@ use function strip_tags;
 use function strlen;
 use function strtolower;
 use function strtoupper;
-use function uniqid;
 
 class TextHelper
 {
@@ -233,9 +231,10 @@ class TextHelper
         return $bool;
     }
 
-    public static function parseBoolean($bool): bool
+    public static function parseBoolean(string|bool|null $bool): bool
     {
-        return 'true' === $bool;
+        // Turn null to false.
+        return (bool) self::parseBooleanOrNull($bool);
     }
 
     public static function renderBoolean(bool $bool): string
