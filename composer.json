@@ -1,5 +1,5 @@
 {
-    "name": "wexample/helpers",
+    "name": "wexample/php-helpers",
     "description": "Various helpers",
     "type": "library",
     "license": "MIT",
