@@ -4,6 +4,8 @@ namespace Wexample\Helpers\Helper;
 
 class ArrayHelper
 {
+    const string PATH_SEPARATOR_DEFAULT = '.';
+
     /**
      * Determines if an array is associative.
      *
@@ -151,5 +153,27 @@ class ArrayHelper
         $b = ArrayHelper::canonicalize($b);
 
         return [$a, $b];
+    }
+
+    public static function getItemByPath(
+        array $data,
+        string|array $key,
+        mixed $default = null,
+        string $separator = self::PATH_SEPARATOR_DEFAULT
+    ): mixed
+    {
+        if (is_string($key)) {
+            $keys = explode($separator, $key);
+        }
+
+        foreach ($keys as $k) {
+            if (is_array($data) && array_key_exists($k, $data)) {
+                $data = $data[$k];
+            } else {
+                return $default;
+            }
+        }
+
+        return $data;
     }
 }
