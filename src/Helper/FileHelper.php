@@ -49,4 +49,15 @@ class FileHelper
 
         return file_put_contents($path, $data, $flags, $context);
     }
+
+    public static function sanitizeFilename(string $string): string
+    {
+        $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string);
+        $string = preg_replace('/[^A-Za-z0-9.\-_]/', '-', $string);
+        $string = preg_replace('/-+/', '-', $string);
+        $string = preg_replace('/\.+/', '.', $string);
+        $string = trim($string, '-.');
+
+        return strtolower($string);
+    }
 }
