@@ -85,7 +85,7 @@ class FileHelper
      * @param string $directoryPath Path to the directory to scan
      * @param string $extension File extension to filter (without dot)
      * @param callable $fileProcessor Callback function to process each file
-     *                The callback receives ($file, $info) where $info is an object with pathinfo data
+     *                The callback receives ($file, $info) where $file is an SplFileInfo object and $info is an object with pathinfo data
      * @return array Results collected from the callback function
      * @throws \Exception If the directory doesn't exist
      */
@@ -103,11 +103,9 @@ class FileHelper
         $it = new RecursiveDirectoryIterator($directoryPath);
 
         foreach (new RecursiveIteratorIterator($it) as $file) {
-            $info = (object) pathinfo($file);
-
-            if ($extension === $info->extension) {
+            if ($extension === $file->getExtension()) {
                 // Process the file and collect the result
-                $result = $fileProcessor($file, $info);
+                $result = $fileProcessor($file);
                 if ($result !== null) {
                     $results[] = $result;
                 }
