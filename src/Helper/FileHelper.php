@@ -103,9 +103,11 @@ class FileHelper
         $it = new RecursiveDirectoryIterator($directoryPath);
 
         foreach (new RecursiveIteratorIterator($it) as $file) {
-            if ($extension === $file->getExtension()) {
+            $info = (object) pathinfo($file);
+
+            if ($extension === $info->extension) {
                 // Process the file and collect the result
-                $result = $fileProcessor($file, $file);
+                $result = $fileProcessor($file, $info);
                 if ($result !== null) {
                     $results[] = $result;
                 }
