@@ -86,15 +86,13 @@ class FileHelper
      * @param string $extension File extension to filter (without dot)
      * @param callable $fileProcessor Callback function to process each file
      *                The callback receives ($file, $info) where $info is an object with pathinfo data
-     * @param string|null $basePath Optional base path for calculating relative paths
      * @return array Results collected from the callback function
      * @throws \Exception If the directory doesn't exist
      */
     public static function scanDirectoryForFiles(
         string $directoryPath,
         string $extension,
-        callable $fileProcessor,
-        ?string $basePath = null
+        callable $fileProcessor
     ): array
     {
         if (!file_exists($directoryPath)) {
@@ -105,19 +103,9 @@ class FileHelper
         $it = new RecursiveDirectoryIterator($directoryPath);
 
         foreach (new RecursiveIteratorIterator($it) as $file) {
-            $info = (object) pathinfo($file);
-
-            if ($extension === $info->extension) {
-                // If basePath is provided, calculate the relative path
-                if ($basePath !== null) {
-                    $info->relativePath = self::buildRelativePath(
-                        $info->dirname,
-                        $basePath
-                    );
-                }
-
+            if ($extension === $file->getExtension()) {
                 // Process the file and collect the result
-                $result = $fileProcessor($file, $info);
+                $result = $fileProcessor($file, $file);
                 if ($result !== null) {
                     $results[] = $result;
                 }
