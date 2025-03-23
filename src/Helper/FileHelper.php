@@ -60,4 +60,17 @@ class FileHelper
 
         return strtolower($string);
     }
+
+    public static function buildRelativePath(
+        string $filePath,
+        string $relativeTo
+    ): ?string {
+        if (str_starts_with($filePath, $relativeTo)) {
+            $relativePath = substr($filePath, strlen($relativeTo));
+            // Ensure the relative path does not start with a '/'
+            return ltrim($relativePath, '/');
+        } else {
+            return null;
+        }
+    }
 }
