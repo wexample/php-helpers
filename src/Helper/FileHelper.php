@@ -2,6 +2,9 @@
 
 namespace Wexample\Helpers\Helper;
 
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+
 class FileHelper
 {
     final public const FOLDER_SEPARATOR = '/';
@@ -64,7 +67,8 @@ class FileHelper
     public static function buildRelativePath(
         string $filePath,
         string $relativeTo
-    ): ?string {
+    ): ?string
+    {
         if (str_starts_with($filePath, $relativeTo)) {
             $relativePath = substr($filePath, strlen($relativeTo));
             // Ensure the relative path does not start with a '/'
@@ -72,5 +76,54 @@ class FileHelper
         } else {
             return null;
         }
+    }
+
+    /**
+     * Recursively scan a directory for files with a specific extension
+     * and process them using a callback function
+     *
+     * @param string $directoryPath Path to the directory to scan
+     * @param string $extension File extension to filter (without dot)
+     * @param callable $fileProcessor Callback function to process each file
+     *                The callback receives ($file, $info) where $info is an object with pathinfo data
+     * @param string|null $basePath Optional base path for calculating relative paths
+     * @return array Results collected from the callback function
+     * @throws \Exception If the directory doesn't exist
+     */
+    public static function scanDirectoryForFiles(
+        string $directoryPath,
+        string $extension,
+        callable $fileProcessor,
+        ?string $basePath = null
+    ): array
+    {
+        if (!file_exists($directoryPath)) {
+            throw new \Exception("Directory not found: $directoryPath");
+        }
+
+        $results = [];
+        $it = new RecursiveDirectoryIterator($directoryPath);
+
+        foreach (new RecursiveIteratorIterator($it) as $file) {
+            $info = (object) pathinfo($file);
+
+            if ($extension === $info->extension) {
+                // If basePath is provided, calculate the relative path
+                if ($basePath !== null) {
+                    $info->relativePath = self::buildRelativePath(
+                        $info->dirname,
+                        $basePath
+                    );
+                }
+
+                // Process the file and collect the result
+                $result = $fileProcessor($file, $info);
+                if ($result !== null) {
+                    $results[] = $result;
+                }
+            }
+        }
+
+        return $results;
     }
 }
