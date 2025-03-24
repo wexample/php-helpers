@@ -114,4 +114,14 @@ class FileHelper
 
         return $results;
     }
+
+    public static function filterNonExisting(array $filesPaths): array
+    {
+        // Filter out non-existent paths
+        return array_filter($filesPaths, function (
+            $path
+        ) {
+            return file_exists($path);
+        });
+    }
 }
