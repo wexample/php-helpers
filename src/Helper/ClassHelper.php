@@ -135,7 +135,7 @@ class ClassHelper
         $classPath = self::getClassPath($entity);
         // Replacement of \Doctrine\Common\Util\ClassUtils::getRealPath()
         if (is_subclass_of($classPath, Proxy::class)) {
-            return (new \ReflectionClass($classPath))->getParentClass();
+            return (new \ReflectionClass($classPath))->getParentClass()->getName();
         }
 
         return $classPath;
@@ -180,7 +180,7 @@ class ClassHelper
      * Return a someThingName form a \App\Entity\SomeThingName.
      * Used to find a field name have a relation to an entity.
      */
-    public static function getFieldName(string $className): string
+    public static function getFieldName(object|string $className): string
     {
         return lcfirst(static::getShortName($className));
     }
