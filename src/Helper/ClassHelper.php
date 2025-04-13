@@ -393,7 +393,7 @@ class ClassHelper
         }
 
         foreach ($reflexion->getMethods() as $method) {
-            if (self::getChildrenAttributes(
+            if (self::hasAttributes(
                 $class . self::METHOD_SEPARATOR . $method->getName(),
                 $attributeClass
             )) {
