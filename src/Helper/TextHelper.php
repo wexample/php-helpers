@@ -194,21 +194,53 @@ class TextHelper
         return $prefix ? $prefix . '_' . $id : $id;
     }
 
-    public static function isNullOrNullString(null|string $null): bool
+    public static function isNullOrNullString(mixed $value): bool
     {
-        return is_null($null) || $null === 'null';
+        if (is_array($value) || is_object($value)) {
+            return false;
+        }
+        
+        return is_null($value) || (is_string($value) && strtolower(trim($value)) === 'null');
     }
 
-    public static function isBoolOrBoolString(bool|string $bool): bool
+    public static function isBoolOrBoolString(mixed $value): bool
     {
-        return $bool === true || $bool === false || $bool === 'true' || $bool === 'false';
+        if (is_bool($value)) {
+            return true;
+        }
+        
+        if (is_array($value) || is_object($value)) {
+            return false;
+        }
+        
+        if (is_string($value)) {
+            $value = strtolower(trim($value));
+            return in_array($value, ['true', 'false'], true);
+        }
+        
+        return false;
     }
 
-    public static function isBooleanOrNull(string $bool): bool
+    public static function isBooleanOrNull(mixed $value): bool
     {
-        $bool = trim(strtolower($bool));
-
-        return self::isBoolOrBoolString($bool) || self::isNullOrNullString($bool);
+        if (is_array($value) || is_object($value)) {
+            return false;
+        }
+        
+        if (is_null($value)) {
+            return true;
+        }
+        
+        if (is_bool($value)) {
+            return true;
+        }
+        
+        if (is_string($value)) {
+            $value = strtolower(trim($value));
+            return in_array($value, ['true', 'false', 'null'], true);
+        }
+        
+        return false;
     }
 
     public static function parseBooleanOrNull(string|bool|null $bool): bool|null
