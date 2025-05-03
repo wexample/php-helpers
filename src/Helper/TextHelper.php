@@ -75,6 +75,11 @@ class TextHelper
         );
     }
 
+    public static function createAbstract(string $string): string
+    {
+        return static::removeDoubleSpaces(strip_tags($string));
+    }
+
     public static function removeDoubleSpaces(string $string): string
     {
         return preg_replace(
