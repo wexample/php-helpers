@@ -52,6 +52,12 @@ class ArrayHelper
         return $array;
     }
 
+    public static function sortByKey(array $array): array
+    {
+        ksort($array);
+        return $array;
+    }
+
     /**
      * Recursively compares two values (arrays or scalars) and returns true if they are identical,
      * false otherwise.
