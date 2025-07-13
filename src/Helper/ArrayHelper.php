@@ -202,4 +202,25 @@ class ArrayHelper
 
         return $result;
     }
+
+    /**
+     * Return the list without the given item.
+     * @param $item
+     * @param array $array
+     * @return array
+     */
+    public static function removeItem(
+        $item,
+        array $array
+    ): array
+    {
+        return array_values(
+            array_filter(
+                $array,
+                static fn(
+                    $currentItem
+                ): bool => $currentItem !== $item
+            )
+        );
+    }
 }
