@@ -204,7 +204,7 @@ class TextHelper
         if (is_array($value) || is_object($value)) {
             return false;
         }
-        
+
         return is_null($value) || (is_string($value) && strtolower(trim($value)) === 'null');
     }
 
@@ -213,16 +213,16 @@ class TextHelper
         if (is_bool($value)) {
             return true;
         }
-        
+
         if (is_array($value) || is_object($value)) {
             return false;
         }
-        
+
         if (is_string($value)) {
             $value = strtolower(trim($value));
             return in_array($value, ['true', 'false'], true);
         }
-        
+
         return false;
     }
 
@@ -231,20 +231,20 @@ class TextHelper
         if (is_array($value) || is_object($value)) {
             return false;
         }
-        
+
         if (is_null($value)) {
             return true;
         }
-        
+
         if (is_bool($value)) {
             return true;
         }
-        
+
         if (is_string($value)) {
             $value = strtolower(trim($value));
             return in_array($value, ['true', 'false', 'null'], true);
         }
-        
+
         return false;
     }
 
@@ -364,6 +364,11 @@ class TextHelper
     public static function splitLines(string $string): array
     {
         return preg_split("/((\r?\n)|(\r\n?))/", $string);
+    }
+
+    public static function removeNewLines(string $string): string
+    {
+        return preg_replace("/(\r\n|\r|\n)/", '', $string);
     }
 
     public static function toCamel(string $string): string
@@ -677,5 +682,14 @@ class TextHelper
     public static function toList(array $array): string
     {
         return PHP_EOL . implode(PHP_EOL, $array) . PHP_EOL;
+    }
+
+    public static function inlineSubString(
+        string $string,
+        int $start,
+        int $length
+    ): string
+    {
+        return substr(TextHelper::removeNewLines($string), $start, $length);
     }
 }
