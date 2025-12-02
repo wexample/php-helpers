@@ -1,6 +1,6 @@
 # wexample/php-helpers
 
-Version: 1.0.70
+Version: 1.0.71
 
 Various helpers
 
