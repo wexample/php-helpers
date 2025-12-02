@@ -129,8 +129,8 @@ Refer to each package's documentation for specific version compatibility require
 
 ## Dependencies
 
-- php: <ConfigValue(type=str, value=>=7.4)>
-- symfony/string: <ConfigValue(type=str, value=^6.2|^7.0)>
+- php: >=7.4
+- symfony/string: ^6.2|^7.0
 
 
 # About us
