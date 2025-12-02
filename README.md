@@ -1,6 +1,6 @@
-# helpers
+# wexample/php-helpers
 
-Version: 1.0.63
+Version: 1.0.65
 
 Various helpers
 
@@ -129,6 +129,8 @@ Refer to each package's documentation for specific version compatibility require
 
 ## Dependencies
 
+- php: >=7.4
+- symfony/string: ^6.2|^7.0
 
 
 # About us
