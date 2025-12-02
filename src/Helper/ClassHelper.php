@@ -2,20 +2,23 @@
 
 namespace Wexample\Helpers\Helper;
 
+use function array_map;
+use function array_slice;
+use function count;
+
 use Doctrine\Persistence\Proxy;
 use Exception;
+
+use function explode;
+use function implode;
+use function is_string;
+use function lcfirst;
+
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 
-use function array_map;
-use function array_slice;
-use function count;
-use function explode;
-use function implode;
-use function is_string;
-use function lcfirst;
 use function str_replace;
 use function strlen;
 use function substr;
@@ -24,37 +27,37 @@ class ClassHelper
 {
     final public const PATH_SEPARATOR = '\\';
 
-    final public const CLASS_APP_BASE_PATH =
-        self::CLASS_PATH_PART_APP
+    final public const CLASS_APP_BASE_PATH
+        = self::CLASS_PATH_PART_APP
         . self::NAMESPACE_SEPARATOR;
 
-    final public const CLASS_API_BASE_PATH =
-        self::CLASS_APP_BASE_PATH
+    final public const CLASS_API_BASE_PATH
+        = self::CLASS_APP_BASE_PATH
         . self::CLASS_PATH_PART_API
         . self::NAMESPACE_SEPARATOR;
 
-    final public const CLASS_ENTITY_BASE_PATH =
-        self::CLASS_APP_BASE_PATH
+    final public const CLASS_ENTITY_BASE_PATH
+        = self::CLASS_APP_BASE_PATH
         . self::CLASS_PATH_PART_ENTITY
         . self::NAMESPACE_SEPARATOR;
 
-    final public const CLASS_TEST_BASE_PATH =
-        self::CLASS_APP_BASE_PATH
+    final public const CLASS_TEST_BASE_PATH
+        = self::CLASS_APP_BASE_PATH
         . self::CLASS_PATH_PART_TESTS
         . self::NAMESPACE_SEPARATOR;
 
-    final public const CLASS_SERVICE_BASE_PATH =
-        self::CLASS_APP_BASE_PATH
+    final public const CLASS_SERVICE_BASE_PATH
+        = self::CLASS_APP_BASE_PATH
         . self::CLASS_PATH_PART_SERVICE
         . self::NAMESPACE_SEPARATOR;
 
-    final public const CLASS_FORM_BASE_PATH =
-        self::CLASS_APP_BASE_PATH
+    final public const CLASS_FORM_BASE_PATH
+        = self::CLASS_APP_BASE_PATH
         . self::CLASS_PATH_PART_FORM
         . self::NAMESPACE_SEPARATOR;
 
-    final public const CLASS_FORM_PROCESSOR_BASE_PATH =
-        self::CLASS_SERVICE_BASE_PATH
+    final public const CLASS_FORM_PROCESSOR_BASE_PATH
+        = self::CLASS_SERVICE_BASE_PATH
         . self::CLASS_PATH_PART_FORM_PROCESSOR
         . self::NAMESPACE_SEPARATOR;
 
@@ -252,7 +255,7 @@ class ClassHelper
     ): ?string {
         $entityPathPath = self::CLASS_ENTITY_BASE_PATH . TextHelper::toClass($entityPath);
 
-        if (!$ifExists || class_exists($entityPathPath)) {
+        if (! $ifExists || class_exists($entityPathPath)) {
             return $entityPathPath;
         }
 
@@ -359,7 +362,7 @@ class ClassHelper
     }
 
     public static function isClassPath(
-        null|object|string $class,
+        object|string|null $class,
         string $className
     ): bool {
         return $class && ClassHelper::getRealClassPath($class) === $className;
@@ -396,7 +399,7 @@ class ClassHelper
         ReflectionMethod|ReflectionClass|string $subjectPath,
         string $attributeClass
     ): bool {
-        return !empty(self::getChildrenAttributes(
+        return ! empty(self::getChildrenAttributes(
             $subjectPath,
             $attributeClass
         ));

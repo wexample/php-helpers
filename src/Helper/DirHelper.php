@@ -26,7 +26,7 @@ class DirHelper
         }
 
         // Try to create the directory recursively.
-        if (!mkdir($path, $mode, true)) {
+        if (! mkdir($path, $mode, true)) {
             throw new \RuntimeException("Failed to create directory: " . $path);
         }
 

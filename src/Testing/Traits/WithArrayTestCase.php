@@ -24,7 +24,7 @@ trait WithArrayTestCase
         bool $allowEmptyMissing = false
     ): void {
         // If there are any differences reported by the helper, generate a diff.
-        if (!ArrayHelper::areSame($expected, $actual, $allowEmptyMissing)) {
+        if (! ArrayHelper::areSame($expected, $actual, $allowEmptyMissing)) {
             // Make ignored différences the same between two arrays.
             ArrayHelper::normalize($expected, $actual, $allowEmptyMissing);
 

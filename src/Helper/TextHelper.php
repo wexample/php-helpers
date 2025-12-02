@@ -2,11 +2,10 @@
 
 namespace Wexample\Helpers\Helper;
 
-use Exception;
-use Symfony\Component\String\Slugger\AsciiSlugger;
-use Symfony\Component\String\UnicodeString;
-
 use function current;
+
+use Exception;
+
 use function explode;
 use function floatval;
 use function htmlspecialchars_decode;
@@ -29,6 +28,9 @@ use function strip_tags;
 use function strlen;
 use function strtolower;
 use function strtoupper;
+
+use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Component\String\UnicodeString;
 
 class TextHelper
 {
@@ -193,6 +195,7 @@ class TextHelper
         ?string $prefix = null
     ): string {
         $id = bin2hex(random_bytes($length / 2));
+
         return $prefix ? $prefix . '_' . $id : $id;
     }
 
@@ -217,6 +220,7 @@ class TextHelper
 
         if (is_string($value)) {
             $value = strtolower(trim($value));
+
             return in_array($value, ['true', 'false'], true);
         }
 
@@ -239,13 +243,14 @@ class TextHelper
 
         if (is_string($value)) {
             $value = strtolower(trim($value));
+
             return in_array($value, ['true', 'false', 'null'], true);
         }
 
         return false;
     }
 
-    public static function parseBooleanOrNull(string|bool|null $bool): bool|null
+    public static function parseBooleanOrNull(string|bool|null $bool): ?bool
     {
         if (is_string($bool)) {
             $bool = trim(strtolower($bool));
@@ -563,7 +568,7 @@ class TextHelper
         mixed $data,
         string $separator = ' '
     ): string {
-        if (!is_string($data)) {
+        if (! is_string($data)) {
             $data = json_encode($data);
         }
 

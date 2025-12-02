@@ -70,6 +70,7 @@ class FileHelper
     ): ?string {
         if (str_starts_with($filePath, $relativeTo)) {
             $relativePath = substr($filePath, strlen($relativeTo));
+
             // Ensure the relative path does not start with a '/'
             return ltrim($relativePath, '/');
         } else {
@@ -93,7 +94,7 @@ class FileHelper
         string $extension,
         callable $fileProcessor
     ): array {
-        if (!file_exists($directoryPath)) {
+        if (! file_exists($directoryPath)) {
             throw new \Exception("Directory not found: $directoryPath");
         }
 
