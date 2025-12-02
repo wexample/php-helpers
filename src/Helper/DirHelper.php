@@ -19,8 +19,7 @@ class DirHelper
     public static function createDirRecursive(
         string $path,
         int $mode = 0755
-    ): bool
-    {
+    ): bool {
         if (is_dir($path)) {
             // The directory already exists.
             return true;

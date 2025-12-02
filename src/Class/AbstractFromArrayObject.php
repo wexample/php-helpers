@@ -4,7 +4,6 @@ namespace Wexample\Helpers\Class;
 
 abstract class AbstractFromArrayObject
 {
-
     /**
      * Constructor that can take an object or array and dynamically assign properties
      *

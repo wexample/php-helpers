@@ -12,8 +12,7 @@ class PathHelper
         string $path,
         string $basePath,
         string $pathSeparator = FileHelper::FOLDER_SEPARATOR
-    ): string
-    {
+    ): string {
         return substr(
             $path,
             strlen(
@@ -33,8 +32,7 @@ class PathHelper
         string $path,
         string $separator,
         $offset = 2
-    ): array
-    {
+    ): array {
         return array_slice(
             explode(
                 $separator,
@@ -52,8 +50,7 @@ class PathHelper
         ?string $cousinSuffix = null,
         ?string $separator = FileHelper::FOLDER_SEPARATOR,
         ?callable $transformer = null
-    ): string
-    {
+    ): string {
         $parts = static::getPathParts(
             $fullPath,
             separator: $separator,

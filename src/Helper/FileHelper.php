@@ -41,8 +41,7 @@ class FileHelper
         string $data,
         int $flags = 0,
         $context = null
-    ): false|int
-    {
+    ): false|int {
         $dir = dirname($path);
 
         DirHelper::createDirRecursive($dir);
@@ -68,8 +67,7 @@ class FileHelper
     public static function buildRelativePath(
         string $filePath,
         string $relativeTo
-    ): ?string
-    {
+    ): ?string {
         if (str_starts_with($filePath, $relativeTo)) {
             $relativePath = substr($filePath, strlen($relativeTo));
             // Ensure the relative path does not start with a '/'
@@ -94,8 +92,7 @@ class FileHelper
         string $directoryPath,
         string $extension,
         callable $fileProcessor
-    ): array
-    {
+    ): array {
         if (!file_exists($directoryPath)) {
             throw new \Exception("Directory not found: $directoryPath");
         }

@@ -23,8 +23,7 @@ trait WithYamlTestCase
         string $actualFilePath,
         string $message = '',
         bool $allowEmptyMissing = false
-    ): void
-    {
+    ): void {
         $expectedArray = Yaml::parse(file_get_contents($expectedFilePath));
         $actualArray = Yaml::parse(file_get_contents($actualFilePath));
         $this->assertArraysEqual(

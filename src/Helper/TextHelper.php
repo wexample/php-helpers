@@ -5,6 +5,7 @@ namespace Wexample\Helpers\Helper;
 use Exception;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\String\UnicodeString;
+
 use function current;
 use function explode;
 use function floatval;
@@ -66,8 +67,7 @@ class TextHelper
     public static function removePrefix(
         string $string,
         string $prefix
-    ): string
-    {
+    ): string {
         return preg_replace(
             '/^' . preg_quote($prefix, '/') . '/',
             '',
@@ -145,8 +145,7 @@ class TextHelper
     public static function getStringFromIntData(
         int $data,
         bool $trimZeros = false
-    ): string
-    {
+    ): string {
         $decPoint = ',';
         $decimals = 2;
 
@@ -171,8 +170,7 @@ class TextHelper
     public static function uniqueFileNameInDir(
         string $dir,
         string $extension
-    ): string
-    {
+    ): string {
         do {
             // Create file name.
             $fileName = static::uniqueFileName() . '.' . $extension;
@@ -193,8 +191,7 @@ class TextHelper
     public static function generateSecureId(
         int $length = 40,
         ?string $prefix = null
-    ): string
-    {
+    ): string {
         $id = bin2hex(random_bytes($length / 2));
         return $prefix ? $prefix . '_' . $id : $id;
     }
@@ -282,8 +279,7 @@ class TextHelper
     public static function objectToFileName(
         $object,
         string $fieldName = 'title'
-    ): string
-    {
+    ): string {
         return TextHelper::toAlphaNum(
             ClassHelper::getFieldGetterValue($object, $fieldName)
         );
@@ -339,8 +335,7 @@ class TextHelper
     public static function hasOne(
         array $needles,
         string $haystack
-    ): bool
-    {
+    ): bool {
         return str_replace($needles, '', $haystack) !== $haystack;
     }
 
@@ -397,8 +392,7 @@ class TextHelper
     public static function removeSuffix(
         string $string,
         string $suffix
-    ): string
-    {
+    ): string {
         return preg_replace(
             '/' . preg_quote($suffix, '/') . '$/',
             '',
@@ -423,8 +417,7 @@ class TextHelper
     public static function emailString(
         string $mail,
         ?string $name = ''
-    ): string
-    {
+    ): string {
         if ($name) {
             $slugger = new AsciiSlugger();
             $name = $slugger->slug($name, ' ');
@@ -450,8 +443,7 @@ class TextHelper
     public static function asciiColorWrap(
         string $string,
         string $color = self::ASCII_COLOR_WHITE
-    ): string
-    {
+    ): string {
         return "\033[1;" . $color . 'm' . $string . "\033[0m";
     }
 
@@ -468,8 +460,7 @@ class TextHelper
         string $string,
         string $prefix,
         string $suffix,
-    ): string
-    {
+    ): string {
         return self::removePrefix(
             self::removeSuffix(
                 $string,
@@ -481,8 +472,7 @@ class TextHelper
 
     public static function trimExtension(
         string $filePath
-    ): string
-    {
+    ): string {
         $info = pathinfo($filePath);
 
         return TextHelper::trimLastChunk(
@@ -494,8 +484,7 @@ class TextHelper
     public static function trimLastChunk(
         string $string,
         string $separator
-    ): string
-    {
+    ): string {
         $exp = explode(
             $separator,
             $string
@@ -512,8 +501,7 @@ class TextHelper
     public static function getFirstChunk(
         string $string,
         string $separator
-    ): string
-    {
+    ): string {
         $exp = explode(
             $separator,
             $string
@@ -525,8 +513,7 @@ class TextHelper
     public static function getLastChunk(
         string $string,
         string $separator
-    ): string
-    {
+    ): string {
         $exp = explode(
             $separator,
             $string
@@ -538,8 +525,7 @@ class TextHelper
     public static function trimLastChunkIfMoreThanOne(
         string $string,
         string $separator
-    ): string
-    {
+    ): string {
         return TextHelper::trimLastChunk(
             $string,
             $separator
@@ -549,8 +535,7 @@ class TextHelper
     public static function trimFirstChunkIfMoreThanOne(
         string $string,
         string $separator
-    ): string
-    {
+    ): string {
         return TextHelper::trimFirstChunk(
             $string,
             $separator
@@ -560,8 +545,7 @@ class TextHelper
     public static function trimFirstChunk(
         string $string,
         string $separator
-    ): string
-    {
+    ): string {
         $exp = explode(
             $separator,
             $string
@@ -578,8 +562,7 @@ class TextHelper
     public static function convertToBinary(
         mixed $data,
         string $separator = ' '
-    ): string
-    {
+    ): string {
         if (!is_string($data)) {
             $data = json_encode($data);
         }
@@ -598,8 +581,7 @@ class TextHelper
     public static function binaryToString(
         string $binary,
         string $separator = ' '
-    ): mixed
-    {
+    ): mixed {
         $binaries = explode($separator, $binary);
 
         $string = null;
@@ -620,8 +602,7 @@ class TextHelper
     public static function decrypt(
         string $msgEncryptedBundle,
         string $password
-    ): string
-    {
+    ): string {
         $password = sha1($password);
         $components = explode(':', $msgEncryptedBundle);
         $iv = $components[0];
@@ -646,7 +627,7 @@ class TextHelper
     {
         if (is_object($value)) {
             return '[' . get_class($value) . ']';
-        } else if (is_array($value)) {
+        } elseif (is_array($value)) {
             return '[' . gettype($value) . ']';
         } elseif (is_bool($value)) {
             return self::renderBoolean($value);
@@ -661,8 +642,7 @@ class TextHelper
     public static function encrypt(
         string $string,
         string $password
-    ): string
-    {
+    ): string {
         $iv = substr(sha1(mt_rand()), 0, 16);
         $password = sha1($password);
         $salt = sha1(mt_rand());
@@ -688,8 +668,7 @@ class TextHelper
         string $string,
         int $start,
         int $length
-    ): string
-    {
+    ): string {
         return substr(TextHelper::removeNewLines($string), $start, $length);
     }
 }

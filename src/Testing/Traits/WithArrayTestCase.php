@@ -22,8 +22,7 @@ trait WithArrayTestCase
         array $actual,
         string $message = '',
         bool $allowEmptyMissing = false
-    ): void
-    {
+    ): void {
         // If there are any differences reported by the helper, generate a diff.
         if (!ArrayHelper::areSame($expected, $actual, $allowEmptyMissing)) {
             // Make ignored différences the same between two arrays.

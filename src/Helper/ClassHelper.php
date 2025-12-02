@@ -8,6 +8,7 @@ use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+
 use function array_map;
 use function array_slice;
 use function count;
@@ -164,8 +165,7 @@ class ClassHelper
         string $classSuffix,
         string $cousinBasePath,
         string $cousinSuffix = ''
-    ): string
-    {
+    ): string {
         return PathHelper::getCousin(
             fullPath: self::getRealClassPath($className),
             sourceBasePath: $classBasePath,
@@ -188,8 +188,7 @@ class ClassHelper
     public static function applyPropertiesSetters(
         object $target,
         array $properties
-    ): void
-    {
+    ): void {
         foreach ($properties as $fieldName => $value) {
             ClassHelper::setFieldSetterValue(
                 $target,
@@ -203,8 +202,7 @@ class ClassHelper
         object $object,
         string $fieldName,
         $fieldValue
-    )
-    {
+    ) {
         $method = 'set' . TextHelper::toClass($fieldName);
 
         return $object->$method($fieldValue);
@@ -213,8 +211,7 @@ class ClassHelper
     public static function getFieldGetterValue(
         object $object,
         string $fieldName
-    )
-    {
+    ) {
         $method = 'get' . TextHelper::toClass($fieldName);
 
         return $object->$method();
@@ -231,8 +228,7 @@ class ClassHelper
     public static function longTableized(
         object|string $name,
         string $separator = '-'
-    ): string
-    {
+    ): string {
         $parts = PathHelper::getPathParts(self::getRealClassPath($name), static::PATH_SEPARATOR);
         $parts = array_map(TextHelper::class . '::toSnake', $parts);
 
@@ -253,8 +249,7 @@ class ClassHelper
     public static function fullEntityClassPathFromEntityPath(
         string $entityPath,
         bool $ifExists = true
-    ): ?string
-    {
+    ): ?string {
         $entityPathPath = self::CLASS_ENTITY_BASE_PATH . TextHelper::toClass($entityPath);
 
         if (!$ifExists || class_exists($entityPathPath)) {
@@ -267,8 +262,7 @@ class ClassHelper
     public static function buildClassFilePath(
         string $className,
         string $folder = null
-    ): string
-    {
+    ): string {
         $parts = explode(self::NAMESPACE_SEPARATOR, $className);
 
         $parts = array_slice(
@@ -281,9 +275,9 @@ class ClassHelper
         );
 
         return ($folder ?: self::getAutoloadFolder($className)) . implode(
-                FileHelper::FOLDER_SEPARATOR,
-                $parts
-            ) . FileHelper::EXTENSION_SEPARATOR . FileHelper::FILE_EXTENSION_PHP;
+            FileHelper::FOLDER_SEPARATOR,
+            $parts
+        ) . FileHelper::EXTENSION_SEPARATOR . FileHelper::FILE_EXTENSION_PHP;
     }
 
     public static function splitNamespace(string $classPath): array
@@ -319,8 +313,7 @@ class ClassHelper
     public static function buildClassNameFromRealPath(
         string $realPath,
         string $projectDir,
-    ): string
-    {
+    ): string {
         $className = substr(
             $realPath,
             strlen($projectDir . self::DIR_SRC),
@@ -337,8 +330,7 @@ class ClassHelper
 
     public static function trimFirstClassChunk(
         string $path
-    ): string
-    {
+    ): string {
         return TextHelper::trimFirstChunk(
             $path,
             ClassHelper::NAMESPACE_SEPARATOR
@@ -347,8 +339,7 @@ class ClassHelper
 
     public static function trimLastClassChunk(
         string $path
-    ): string
-    {
+    ): string {
         return TextHelper::trimLastChunk(
             $path,
             ClassHelper::NAMESPACE_SEPARATOR
@@ -359,8 +350,7 @@ class ClassHelper
         array $parts,
         bool $startSeparator = false,
         bool $endSeparator = false,
-    ): string
-    {
+    ): string {
         return ($startSeparator ? ClassHelper::NAMESPACE_SEPARATOR : '')
             . implode(
                 ClassHelper::NAMESPACE_SEPARATOR,
@@ -371,8 +361,7 @@ class ClassHelper
     public static function isClassPath(
         null|object|string $class,
         string $className
-    ): bool
-    {
+    ): bool {
         return $class && ClassHelper::getRealClassPath($class) === $className;
     }
 
@@ -382,8 +371,7 @@ class ClassHelper
     public static function getAllMethodsWithChildrenAttribute(
         string $class,
         string $attributeClass
-    ): array
-    {
+    ): array {
         $methods = [];
 
         try {
@@ -407,8 +395,7 @@ class ClassHelper
     public static function hasAttributes(
         ReflectionMethod|ReflectionClass|string $subjectPath,
         string $attributeClass
-    ): bool
-    {
+    ): bool {
         return !empty(self::getChildrenAttributes(
             $subjectPath,
             $attributeClass
@@ -421,8 +408,7 @@ class ClassHelper
     public static function getChildrenAttributes(
         ReflectionMethod|ReflectionClass|string $subjectPath,
         string $attributeClass
-    ): array
-    {
+    ): array {
         if (is_string($subjectPath)) {
             if (str_contains($subjectPath, ClassHelper::METHOD_SEPARATOR)) {
                 try {
@@ -458,8 +444,7 @@ class ClassHelper
     public static function classUsesTrait(
         string|object $class,
         string $trait
-    ): bool
-    {
+    ): bool {
         return in_array(
             $trait,
             self::classUsagesRecursive($class)
@@ -503,8 +488,7 @@ class ClassHelper
         string $path,
         string $classPathPrefix = '',
         string $classPathSuffix = ''
-    ): string
-    {
+    ): string {
         $pathParts = explode(
             FileHelper::FOLDER_SEPARATOR,
             rtrim(
@@ -518,17 +502,16 @@ class ClassHelper
         }
 
         return $classPathPrefix . implode(
-                ClassHelper::NAMESPACE_SEPARATOR,
-                $pathParts
-            )
+            ClassHelper::NAMESPACE_SEPARATOR,
+            $pathParts
+        )
             . $classPathSuffix;
     }
 
     public static function classImplementsInterface(
         string|object $class,
         string $interface
-    ): bool
-    {
+    ): bool {
         $interfaces = class_implements($class);
 
         if (isset($interfaces[$interface])) {
@@ -542,8 +525,7 @@ class ClassHelper
         object $object,
         string $methodName,
         array $arguments = []
-    ): mixed
-    {
+    ): mixed {
         // Check if the method exists in the object
         if (method_exists($object, $methodName)) {
             // Call the method with arguments
@@ -557,8 +539,7 @@ class ClassHelper
     public static function isSameClassMethod(
         $classMethodPathA,
         $classMethodPathB
-    ): bool
-    {
+    ): bool {
         $reflectionMethodA = new ReflectionMethod(...explode(self::METHOD_SEPARATOR, $classMethodPathA));
         $reflectionMethodB = new ReflectionMethod(...explode(self::METHOD_SEPARATOR, $classMethodPathB));
 
@@ -568,9 +549,8 @@ class ClassHelper
     public static function sortOn(
         array $classes,
         string $fieldName
-    ): array
-    {
-        usort($classes, fn(
+    ): array {
+        usort($classes, fn (
             $a,
             $b
         ) => ClassHelper::getFieldGetterValue($a, $fieldName) <=> ClassHelper::getFieldGetterValue($b, $fieldName));

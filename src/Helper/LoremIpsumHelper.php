@@ -43,7 +43,7 @@ final class LoremIpsumHelper
         // Always start with "Lorem ipsum"
         $text = self::BASE_START . ' ';
         $currentLength = mb_strlen($text, 'UTF-8');
-        
+
         // Add random sentences until we reach desired length
         while ($currentLength < $length) {
             $sentence = self::LOREM_SENTENCES[array_rand(self::LOREM_SENTENCES)];
