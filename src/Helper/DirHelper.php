@@ -32,4 +32,27 @@ class DirHelper
 
         return true;
     }
+
+    /**
+     * Removes a directory recursively.
+     *
+     * This function deletes a directory and all its contents (files and subdirectories).
+     * If the directory does not exist, the function returns without error.
+     *
+     * @param string $dir The path of the directory to remove.
+     * @return void
+     */
+    public static function removeDirRecursive(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        $files = array_diff(scandir($dir), ['.', '..']);
+        foreach ($files as $file) {
+            $path = "{$dir}/{$file}";
+            is_dir($path) ? self::removeDirRecursive($path) : unlink($path);
+        }
+        rmdir($dir);
+    }
 }
