@@ -405,6 +405,50 @@ class ClassHelper
         ));
     }
 
+    public static function hasAttributesInHierarchy(
+        ReflectionMethod|ReflectionClass|string $subjectPath,
+        string $attributeClass
+    ): bool {
+        if (self::hasAttributes($subjectPath, $attributeClass)) {
+            return true;
+        }
+
+        if ($subjectPath instanceof ReflectionMethod) {
+            return false;
+        }
+
+        if (is_string($subjectPath)) {
+            if (str_contains($subjectPath, self::METHOD_SEPARATOR)) {
+                return false;
+            }
+
+            if (! class_exists($subjectPath)) {
+                return false;
+            }
+
+            try {
+                $reflection = new ReflectionClass($subjectPath);
+            } catch (Exception) {
+                return false;
+            }
+        } elseif ($subjectPath instanceof ReflectionClass) {
+            $reflection = $subjectPath;
+        } else {
+            return false;
+        }
+
+        $parent = $reflection->getParentClass();
+        while ($parent) {
+            if (self::hasAttributes($parent, $attributeClass)) {
+                return true;
+            }
+
+            $parent = $parent->getParentClass();
+        }
+
+        return false;
+    }
+
     /**
      * @return ReflectionAttribute[]
      */
