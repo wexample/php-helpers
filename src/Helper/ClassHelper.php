@@ -171,6 +171,11 @@ class ClassHelper
         return null;
     }
 
+    public static function normalizeNamespacePrefix(string $namespace): string
+    {
+        return rtrim($namespace, self::NAMESPACE_SEPARATOR) . self::NAMESPACE_SEPARATOR;
+    }
+
     /**
      * @throws ReflectionException
      */
