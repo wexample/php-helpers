@@ -159,6 +159,18 @@ class ClassHelper
         return $classPath;
     }
 
+    public static function getMethodNameFromClassPath(string $classPath): ?string
+    {
+        if (str_contains($classPath, self::METHOD_SEPARATOR)) {
+            return TextHelper::getLastChunk(
+                $classPath,
+                self::METHOD_SEPARATOR,
+            );
+        }
+
+        return null;
+    }
+
     /**
      * @throws ReflectionException
      */
