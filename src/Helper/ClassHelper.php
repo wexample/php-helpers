@@ -176,6 +176,14 @@ class ClassHelper
         return rtrim($namespace, self::NAMESPACE_SEPARATOR) . self::NAMESPACE_SEPARATOR;
     }
 
+    public static function getNamespaceDepth(string $classPath, string $namespacePrefix): int
+    {
+        $namespacePrefix = self::normalizeNamespacePrefix($namespacePrefix);
+        $relativePath = substr($classPath, strlen($namespacePrefix));
+
+        return substr_count($relativePath, self::PATH_SEPARATOR);
+    }
+
     /**
      * @throws ReflectionException
      */
