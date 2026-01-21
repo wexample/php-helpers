@@ -226,21 +226,69 @@ class ClassHelper
         }
     }
 
+    public static function buildFieldSetterName(string $fieldName): string
+    {
+        return 'set' . TextHelper::toClass($fieldName);
+    }
+
+    public static function buildFieldGetterName(string $fieldName): string
+    {
+        return 'get' . TextHelper::toClass($fieldName);
+    }
+
+    public static function hasFieldSetter(object|string $object, string $fieldName): bool
+    {
+        $className = is_string($object) ? $object : $object::class;
+
+        return method_exists($className, self::buildFieldSetterName($fieldName));
+    }
+
+    public static function hasFieldGetter(object|string $object, string $fieldName): bool
+    {
+        $className = is_string($object) ? $object : $object::class;
+
+        return method_exists($className, self::buildFieldGetterName($fieldName));
+    }
+
     public static function setFieldSetterValue(
-        object $object,
+        object|string $object,
         string $fieldName,
         $fieldValue
     ) {
-        $method = 'set' . TextHelper::toClass($fieldName);
+        $method = self::buildFieldSetterName($fieldName);
+
+        if (is_string($object)) {
+            if (!class_exists($object)) {
+                throw new \RuntimeException(sprintf('Class "%s" does not exist.', $object));
+            }
+
+            if (!method_exists($object, $method)) {
+                throw new \RuntimeException(sprintf('Setter "%s" not found on "%s".', $method, $object));
+            }
+
+            return null;
+        }
 
         return $object->$method($fieldValue);
     }
 
     public static function getFieldGetterValue(
-        object $object,
+        object|string $object,
         string $fieldName
     ) {
-        $method = 'get' . TextHelper::toClass($fieldName);
+        $method = self::buildFieldGetterName($fieldName);
+
+        if (is_string($object)) {
+            if (!class_exists($object)) {
+                throw new \RuntimeException(sprintf('Class "%s" does not exist.', $object));
+            }
+
+            if (!method_exists($object, $method)) {
+                throw new \RuntimeException(sprintf('Getter "%s" not found on "%s".', $method, $object));
+            }
+
+            return null;
+        }
 
         return $object->$method();
     }
