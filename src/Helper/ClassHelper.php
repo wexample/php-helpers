@@ -159,6 +159,31 @@ class ClassHelper
         return $classPath;
     }
 
+    public static function getMethodNameFromClassPath(string $classPath): ?string
+    {
+        if (str_contains($classPath, self::METHOD_SEPARATOR)) {
+            return TextHelper::getLastChunk(
+                $classPath,
+                self::METHOD_SEPARATOR,
+            );
+        }
+
+        return null;
+    }
+
+    public static function normalizeNamespacePrefix(string $namespace): string
+    {
+        return rtrim($namespace, self::NAMESPACE_SEPARATOR) . self::NAMESPACE_SEPARATOR;
+    }
+
+    public static function getNamespaceDepth(string $classPath, string $namespacePrefix): int
+    {
+        $namespacePrefix = self::normalizeNamespacePrefix($namespacePrefix);
+        $relativePath = substr($classPath, strlen($namespacePrefix));
+
+        return substr_count($relativePath, self::PATH_SEPARATOR);
+    }
+
     /**
      * @throws ReflectionException
      */
@@ -201,21 +226,69 @@ class ClassHelper
         }
     }
 
+    public static function buildFieldSetterName(string $fieldName): string
+    {
+        return 'set' . TextHelper::toClass($fieldName);
+    }
+
+    public static function buildFieldGetterName(string $fieldName): string
+    {
+        return 'get' . TextHelper::toClass($fieldName);
+    }
+
+    public static function hasFieldSetter(object|string $object, string $fieldName): bool
+    {
+        $className = is_string($object) ? $object : $object::class;
+
+        return method_exists($className, self::buildFieldSetterName($fieldName));
+    }
+
+    public static function hasFieldGetter(object|string $object, string $fieldName): bool
+    {
+        $className = is_string($object) ? $object : $object::class;
+
+        return method_exists($className, self::buildFieldGetterName($fieldName));
+    }
+
     public static function setFieldSetterValue(
-        object $object,
+        object|string $object,
         string $fieldName,
         $fieldValue
     ) {
-        $method = 'set' . TextHelper::toClass($fieldName);
+        $method = self::buildFieldSetterName($fieldName);
+
+        if (is_string($object)) {
+            if (! class_exists($object)) {
+                throw new \RuntimeException(sprintf('Class "%s" does not exist.', $object));
+            }
+
+            if (! method_exists($object, $method)) {
+                throw new \RuntimeException(sprintf('Setter "%s" not found on "%s".', $method, $object));
+            }
+
+            return null;
+        }
 
         return $object->$method($fieldValue);
     }
 
     public static function getFieldGetterValue(
-        object $object,
+        object|string $object,
         string $fieldName
     ) {
-        $method = 'get' . TextHelper::toClass($fieldName);
+        $method = self::buildFieldGetterName($fieldName);
+
+        if (is_string($object)) {
+            if (! class_exists($object)) {
+                throw new \RuntimeException(sprintf('Class "%s" does not exist.', $object));
+            }
+
+            if (! method_exists($object, $method)) {
+                throw new \RuntimeException(sprintf('Getter "%s" not found on "%s".', $method, $object));
+            }
+
+            return null;
+        }
 
         return $object->$method();
     }
@@ -403,6 +476,50 @@ class ClassHelper
             $subjectPath,
             $attributeClass
         ));
+    }
+
+    public static function hasAttributesInHierarchy(
+        ReflectionMethod|ReflectionClass|string $subjectPath,
+        string $attributeClass
+    ): bool {
+        if (self::hasAttributes($subjectPath, $attributeClass)) {
+            return true;
+        }
+
+        if ($subjectPath instanceof ReflectionMethod) {
+            return false;
+        }
+
+        if (is_string($subjectPath)) {
+            if (str_contains($subjectPath, self::METHOD_SEPARATOR)) {
+                return false;
+            }
+
+            if (! class_exists($subjectPath)) {
+                return false;
+            }
+
+            try {
+                $reflection = new ReflectionClass($subjectPath);
+            } catch (Exception) {
+                return false;
+            }
+        } elseif ($subjectPath instanceof ReflectionClass) {
+            $reflection = $subjectPath;
+        } else {
+            return false;
+        }
+
+        $parent = $reflection->getParentClass();
+        while ($parent) {
+            if (self::hasAttributes($parent, $attributeClass)) {
+                return true;
+            }
+
+            $parent = $parent->getParentClass();
+        }
+
+        return false;
     }
 
     /**
