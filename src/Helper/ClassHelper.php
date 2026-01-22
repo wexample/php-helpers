@@ -258,11 +258,11 @@ class ClassHelper
         $method = self::buildFieldSetterName($fieldName);
 
         if (is_string($object)) {
-            if (!class_exists($object)) {
+            if (! class_exists($object)) {
                 throw new \RuntimeException(sprintf('Class "%s" does not exist.', $object));
             }
 
-            if (!method_exists($object, $method)) {
+            if (! method_exists($object, $method)) {
                 throw new \RuntimeException(sprintf('Setter "%s" not found on "%s".', $method, $object));
             }
 
@@ -279,11 +279,11 @@ class ClassHelper
         $method = self::buildFieldGetterName($fieldName);
 
         if (is_string($object)) {
-            if (!class_exists($object)) {
+            if (! class_exists($object)) {
                 throw new \RuntimeException(sprintf('Class "%s" does not exist.', $object));
             }
 
-            if (!method_exists($object, $method)) {
+            if (! method_exists($object, $method)) {
                 throw new \RuntimeException(sprintf('Getter "%s" not found on "%s".', $method, $object));
             }
 
