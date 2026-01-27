@@ -293,6 +293,36 @@ class ClassHelper
         return $object->$method();
     }
 
+    public static function getFieldGetterValueOrDefault(
+        object|string $object,
+        string $fieldName,
+        mixed $default = null
+    ): mixed {
+        $method = self::buildFieldGetterName($fieldName);
+
+        if (is_string($object)) {
+            if (! class_exists($object)) {
+                return $default;
+            }
+
+            if (! method_exists($object, $method)) {
+                return $default;
+            }
+
+            return null;
+        }
+
+        if (! method_exists($object, $method)) {
+            return $default;
+        }
+
+        try {
+            return $object->$method();
+        } catch (\Throwable) {
+            return $default;
+        }
+    }
+
     public static function longTableizedNameToClass(string $name): string
     {
         $exp = explode('-', $name);
