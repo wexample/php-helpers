@@ -55,4 +55,24 @@ class DirHelper
         }
         rmdir($dir);
     }
+
+    /**
+     * List files in a directory using a glob pattern.
+     */
+    public static function listFiles(
+        string $dir,
+        string $pattern = '*'
+    ): array {
+        if (! is_dir($dir)) {
+            return [];
+        }
+
+        $path = rtrim($dir, '/').'/'.$pattern;
+        $files = glob($path) ?: [];
+
+        $files = array_values(array_filter($files, 'is_file'));
+        sort($files);
+
+        return $files;
+    }
 }

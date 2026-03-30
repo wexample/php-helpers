@@ -175,7 +175,7 @@ class TextHelper
     ): string {
         do {
             // Create file name.
-            $fileName = static::uniqueFileName() . '.' . $extension;
+            $fileName = TextHelper::generateSecureId() . '.' . $extension;
         } while (is_file($dir . $fileName));
 
         return $fileName;
