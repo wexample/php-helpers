@@ -2,23 +2,19 @@
 
 namespace Wexample\Helpers\Helper;
 
-use function array_map;
-use function array_slice;
-use function count;
-
 use Doctrine\Persistence\Proxy;
 use Exception;
-
-use function explode;
-use function implode;
-use function is_string;
-use function lcfirst;
-
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
-
+use function array_map;
+use function array_slice;
+use function count;
+use function explode;
+use function implode;
+use function is_string;
+use function lcfirst;
 use function str_replace;
 use function strlen;
 use function substr;
@@ -176,7 +172,10 @@ class ClassHelper
         return rtrim($namespace, self::NAMESPACE_SEPARATOR) . self::NAMESPACE_SEPARATOR;
     }
 
-    public static function getNamespaceDepth(string $classPath, string $namespacePrefix): int
+    public static function getNamespaceDepth(
+        string $classPath,
+        string $namespacePrefix
+    ): int
     {
         $namespacePrefix = self::normalizeNamespacePrefix($namespacePrefix);
         $relativePath = substr($classPath, strlen($namespacePrefix));
@@ -193,7 +192,8 @@ class ClassHelper
         string $classSuffix,
         string $cousinBasePath,
         string $cousinSuffix = ''
-    ): string {
+    ): string
+    {
         return PathHelper::getCousin(
             fullPath: self::getRealClassPath($className),
             sourceBasePath: $classBasePath,
@@ -216,7 +216,8 @@ class ClassHelper
     public static function applyPropertiesSetters(
         object $target,
         array $properties
-    ): void {
+    ): void
+    {
         foreach ($properties as $fieldName => $value) {
             ClassHelper::setFieldSetterValue(
                 $target,
@@ -236,14 +237,20 @@ class ClassHelper
         return 'get' . TextHelper::toClass($fieldName);
     }
 
-    public static function hasFieldSetter(object|string $object, string $fieldName): bool
+    public static function hasFieldSetter(
+        object|string $object,
+        string $fieldName
+    ): bool
     {
         $className = is_string($object) ? $object : $object::class;
 
         return method_exists($className, self::buildFieldSetterName($fieldName));
     }
 
-    public static function hasFieldGetter(object|string $object, string $fieldName): bool
+    public static function hasFieldGetter(
+        object|string $object,
+        string $fieldName
+    ): bool
     {
         $className = is_string($object) ? $object : $object::class;
 
@@ -254,15 +261,16 @@ class ClassHelper
         object|string $object,
         string $fieldName,
         $fieldValue
-    ) {
+    )
+    {
         $method = self::buildFieldSetterName($fieldName);
 
         if (is_string($object)) {
-            if (! class_exists($object)) {
+            if (!class_exists($object)) {
                 throw new \RuntimeException(sprintf('Class "%s" does not exist.', $object));
             }
 
-            if (! method_exists($object, $method)) {
+            if (!method_exists($object, $method)) {
                 throw new \RuntimeException(sprintf('Setter "%s" not found on "%s".', $method, $object));
             }
 
@@ -275,15 +283,16 @@ class ClassHelper
     public static function getFieldGetterValue(
         object|string $object,
         string $fieldName
-    ) {
+    )
+    {
         $method = self::buildFieldGetterName($fieldName);
 
         if (is_string($object)) {
-            if (! class_exists($object)) {
+            if (!class_exists($object)) {
                 throw new \RuntimeException(sprintf('Class "%s" does not exist.', $object));
             }
 
-            if (! method_exists($object, $method)) {
+            if (!method_exists($object, $method)) {
                 throw new \RuntimeException(sprintf('Getter "%s" not found on "%s".', $method, $object));
             }
 
@@ -297,22 +306,23 @@ class ClassHelper
         object|string $object,
         string $fieldName,
         mixed $default = null
-    ): mixed {
+    ): mixed
+    {
         $method = self::buildFieldGetterName($fieldName);
 
         if (is_string($object)) {
-            if (! class_exists($object)) {
+            if (!class_exists($object)) {
                 return $default;
             }
 
-            if (! method_exists($object, $method)) {
+            if (!method_exists($object, $method)) {
                 return $default;
             }
 
             return null;
         }
 
-        if (! method_exists($object, $method)) {
+        if (!method_exists($object, $method)) {
             return $default;
         }
 
@@ -334,7 +344,8 @@ class ClassHelper
     public static function longTableized(
         object|string $name,
         string $separator = '-'
-    ): string {
+    ): string
+    {
         $parts = PathHelper::getPathParts(self::getRealClassPath($name), static::PATH_SEPARATOR);
         $parts = array_map(TextHelper::class . '::toSnake', $parts);
 
@@ -355,10 +366,11 @@ class ClassHelper
     public static function fullEntityClassPathFromEntityPath(
         string $entityPath,
         bool $ifExists = true
-    ): ?string {
+    ): ?string
+    {
         $entityPathPath = self::CLASS_ENTITY_BASE_PATH . TextHelper::toClass($entityPath);
 
-        if (! $ifExists || class_exists($entityPathPath)) {
+        if (!$ifExists || class_exists($entityPathPath)) {
             return $entityPathPath;
         }
 
@@ -368,7 +380,8 @@ class ClassHelper
     public static function buildClassFilePath(
         string $className,
         string $folder = null
-    ): string {
+    ): string
+    {
         $parts = explode(self::NAMESPACE_SEPARATOR, $className);
 
         $parts = array_slice(
@@ -381,9 +394,9 @@ class ClassHelper
         );
 
         return ($folder ?: self::getAutoloadFolder($className)) . implode(
-            FileHelper::FOLDER_SEPARATOR,
-            $parts
-        ) . FileHelper::EXTENSION_SEPARATOR . FileHelper::FILE_EXTENSION_PHP;
+                FileHelper::FOLDER_SEPARATOR,
+                $parts
+            ) . FileHelper::EXTENSION_SEPARATOR . FileHelper::FILE_EXTENSION_PHP;
     }
 
     public static function splitNamespace(string $classPath): array
@@ -419,7 +432,8 @@ class ClassHelper
     public static function buildClassNameFromRealPath(
         string $realPath,
         string $projectDir,
-    ): string {
+    ): string
+    {
         $className = substr(
             $realPath,
             strlen($projectDir . self::DIR_SRC),
@@ -436,7 +450,8 @@ class ClassHelper
 
     public static function trimFirstClassChunk(
         string $path
-    ): string {
+    ): string
+    {
         return TextHelper::trimFirstChunk(
             $path,
             ClassHelper::NAMESPACE_SEPARATOR
@@ -445,7 +460,8 @@ class ClassHelper
 
     public static function trimLastClassChunk(
         string $path
-    ): string {
+    ): string
+    {
         return TextHelper::trimLastChunk(
             $path,
             ClassHelper::NAMESPACE_SEPARATOR
@@ -456,7 +472,8 @@ class ClassHelper
         array $parts,
         bool $startSeparator = false,
         bool $endSeparator = false,
-    ): string {
+    ): string
+    {
         return ($startSeparator ? ClassHelper::NAMESPACE_SEPARATOR : '')
             . implode(
                 ClassHelper::NAMESPACE_SEPARATOR,
@@ -467,7 +484,8 @@ class ClassHelper
     public static function isClassPath(
         object|string|null $class,
         string $className
-    ): bool {
+    ): bool
+    {
         return $class && ClassHelper::getRealClassPath($class) === $className;
     }
 
@@ -477,7 +495,8 @@ class ClassHelper
     public static function getAllMethodsWithChildrenAttribute(
         string $class,
         string $attributeClass
-    ): array {
+    ): array
+    {
         $methods = [];
 
         try {
@@ -501,8 +520,9 @@ class ClassHelper
     public static function hasAttributes(
         ReflectionMethod|ReflectionClass|string $subjectPath,
         string $attributeClass
-    ): bool {
-        return ! empty(self::getChildrenAttributes(
+    ): bool
+    {
+        return !empty(self::getChildrenAttributes(
             $subjectPath,
             $attributeClass
         ));
@@ -511,7 +531,8 @@ class ClassHelper
     public static function hasAttributesInHierarchy(
         ReflectionMethod|ReflectionClass|string $subjectPath,
         string $attributeClass
-    ): bool {
+    ): bool
+    {
         if (self::hasAttributes($subjectPath, $attributeClass)) {
             return true;
         }
@@ -525,7 +546,7 @@ class ClassHelper
                 return false;
             }
 
-            if (! class_exists($subjectPath)) {
+            if (!class_exists($subjectPath)) {
                 return false;
             }
 
@@ -558,7 +579,8 @@ class ClassHelper
     public static function getChildrenAttributes(
         ReflectionMethod|ReflectionClass|string $subjectPath,
         string $attributeClass
-    ): array {
+    ): array
+    {
         if (is_string($subjectPath)) {
             if (str_contains($subjectPath, ClassHelper::METHOD_SEPARATOR)) {
                 try {
@@ -594,7 +616,8 @@ class ClassHelper
     public static function classUsesTrait(
         string|object $class,
         string $trait
-    ): bool {
+    ): bool
+    {
         return in_array(
             $trait,
             self::classUsagesRecursive($class)
@@ -638,7 +661,8 @@ class ClassHelper
         string $path,
         string $classPathPrefix = '',
         string $classPathSuffix = ''
-    ): string {
+    ): string
+    {
         $pathParts = explode(
             FileHelper::FOLDER_SEPARATOR,
             rtrim(
@@ -652,16 +676,17 @@ class ClassHelper
         }
 
         return $classPathPrefix . implode(
-            ClassHelper::NAMESPACE_SEPARATOR,
-            $pathParts
-        )
+                ClassHelper::NAMESPACE_SEPARATOR,
+                $pathParts
+            )
             . $classPathSuffix;
     }
 
     public static function classImplementsInterface(
         string|object $class,
         string $interface
-    ): bool {
+    ): bool
+    {
         $interfaces = class_implements($class);
 
         if (isset($interfaces[$interface])) {
@@ -675,7 +700,8 @@ class ClassHelper
         object $object,
         string $methodName,
         array $arguments = []
-    ): mixed {
+    ): mixed
+    {
         // Check if the method exists in the object
         if (method_exists($object, $methodName)) {
             // Call the method with arguments
@@ -689,7 +715,8 @@ class ClassHelper
     public static function isSameClassMethod(
         $classMethodPathA,
         $classMethodPathB
-    ): bool {
+    ): bool
+    {
         $reflectionMethodA = new ReflectionMethod(...explode(self::METHOD_SEPARATOR, $classMethodPathA));
         $reflectionMethodB = new ReflectionMethod(...explode(self::METHOD_SEPARATOR, $classMethodPathB));
 
@@ -699,8 +726,9 @@ class ClassHelper
     public static function sortOn(
         array $classes,
         string $fieldName
-    ): array {
-        usort($classes, fn (
+    ): array
+    {
+        usort($classes, fn(
             $a,
             $b
         ) => ClassHelper::getFieldGetterValue($a, $fieldName) <=> ClassHelper::getFieldGetterValue($b, $fieldName));
