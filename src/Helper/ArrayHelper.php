@@ -4,7 +4,7 @@ namespace Wexample\Helpers\Helper;
 
 class ArrayHelper
 {
-    const string PATH_SEPARATOR_DEFAULT = '.';
+    public const string PATH_SEPARATOR_DEFAULT = '.';
 
     /**
      * Determines if an array is associative.
@@ -55,6 +55,7 @@ class ArrayHelper
     public static function sortByKey(array $array): array
     {
         ksort($array);
+
         return $array;
     }
 
@@ -75,31 +76,31 @@ class ArrayHelper
         mixed $expected,
         mixed $actual,
         bool $allowEmptyMissing = false
-    ): bool
-    {
+    ): bool {
         if (is_array($expected) && is_array($actual)) {
             // Compare expected keys with actual values.
             foreach ($expected as $key => $expectedValue) {
-                if (!array_key_exists($key, $actual)) {
+                if (! array_key_exists($key, $actual)) {
                     // If allowed, ignore the missing key if the expected value is an empty array.
-                    if (!($allowEmptyMissing && is_array($expectedValue) && empty($expectedValue))) {
+                    if (! ($allowEmptyMissing && is_array($expectedValue) && empty($expectedValue))) {
                         return false;
                     }
                 } else {
-                    if (!self::areSame($expectedValue, $actual[$key], $allowEmptyMissing)) {
+                    if (! self::areSame($expectedValue, $actual[$key], $allowEmptyMissing)) {
                         return false;
                     }
                 }
             }
             // Check for extra keys present in $actual but not in $expected.
             foreach ($actual as $key => $actualValue) {
-                if (!array_key_exists($key, $expected)) {
+                if (! array_key_exists($key, $expected)) {
                     // If allowed, ignore the extra key if the actual value is an empty array.
-                    if (!($allowEmptyMissing && is_array($actualValue) && empty($actualValue))) {
+                    if (! ($allowEmptyMissing && is_array($actualValue) && empty($actualValue))) {
                         return false;
                     }
                 }
             }
+
             return true;
         } else {
             // For scalars or differing types, perform a strict comparison.
@@ -123,14 +124,13 @@ class ArrayHelper
         array &$a,
         array &$b,
         bool $allowEmptyMissing = false
-    ): array
-    {
+    ): array {
         // If not allowing empty missing, nothing to normalize.
         if ($allowEmptyMissing) {
 
             // Normalize $a based on $b:
             foreach ($b as $key => $value) {
-                if (!array_key_exists($key, $a)) {
+                if (! array_key_exists($key, $a)) {
                     // If $b has an empty array at this key and $a is missing it, add it.
                     if (is_array($value) && empty($value)) {
                         $a[$key] = [];
@@ -145,7 +145,7 @@ class ArrayHelper
 
             // Normalize $b based on $a:
             foreach ($a as $key => $value) {
-                if (!array_key_exists($key, $b)) {
+                if (! array_key_exists($key, $b)) {
                     // If $a has an empty array at this key and $b is missing it, add it.
                     if (is_array($value) && empty($value)) {
                         $b[$key] = [];
@@ -166,8 +166,7 @@ class ArrayHelper
         string|array $key,
         mixed $default = null,
         string $separator = self::PATH_SEPARATOR_DEFAULT
-    ): mixed
-    {
+    ): mixed {
         if (is_string($key)) {
             $keys = explode($separator, $key);
         }
@@ -186,8 +185,7 @@ class ArrayHelper
     public static function flattenArray(
         array $array,
         string $prefix = ''
-    ): array
-    {
+    ): array {
         $result = [];
 
         foreach ($array as $key => $value) {
@@ -212,12 +210,11 @@ class ArrayHelper
     public static function removeItem(
         $item,
         array $array
-    ): array
-    {
+    ): array {
         return array_values(
             array_filter(
                 $array,
-                static fn(
+                static fn (
                     $currentItem
                 ): bool => $currentItem !== $item
             )
