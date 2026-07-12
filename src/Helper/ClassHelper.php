@@ -176,6 +176,12 @@ class ClassHelper
         return rtrim($namespace, self::NAMESPACE_SEPARATOR) . self::NAMESPACE_SEPARATOR;
     }
 
+    public static function classPathMatchesPrefix(string $controller, string $prefix): bool
+    {
+        return str_starts_with($controller, $prefix)
+            || $controller === rtrim($prefix, self::NAMESPACE_SEPARATOR);
+    }
+
     public static function getNamespaceDepth(
         string $classPath,
         string $namespacePrefix
