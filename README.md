@@ -1,6 +1,6 @@
 # php_helpers
 
-Version: 1.1.3
+Version: 2.0.0
 
 Various helpers
 
