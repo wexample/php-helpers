@@ -30,6 +30,7 @@ The helpers and what they own:
 | `ClassHelper` | Namespace and class-name math: `getShortName`, `getRealClassPath` (Doctrine proxy-aware), `getClassCousin`, attribute scanning via `ReflectionClass` / `ReflectionMethod`, getter/setter builders and callers. |
 | `DateHelper` | PHP `date()` format string constants only — no logic. |
 | `DirHelper` | `createDirRecursive`, `removeDirRecursive`, `listFiles` with a glob pattern. |
+| `EmojiHelper` | `convertEmoji(string)` — rewrites ASCII smileys into their emoji, from a fixed map of 146 spellings. |
 | `FileHelper` | File extension and path separator constants. `putContentsRecursive` (delegates directory creation to `DirHelper`). `scanDirectoryForFiles` with a `RecursiveDirectoryIterator`. |
 | `HttpHelper` | HTTP `Content-Type` string constants only — no logic. |
 | `LoremIpsumHelper` | `generate(int $length)` — assembles placeholder text from a fixed sentence pool, always starting with `"Lorem ipsum"`. |

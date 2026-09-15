@@ -1,8 +1,8 @@
 # php_helpers
 
-Version: 3.0.0
+Version: 3.1.0
 
-`wexample/php-helpers` is a PHP library of static utility classes covering string manipulation, array operations, PHP class and namespace reflection, filesystem path handling, and date format constants. It targets PHP developers — particularly those working in the Wexample ecosystem — who need reliable, framework-agnostic helpers without a heavy dependency chain. The library requires PHP ≥ 7.4 and has a single runtime dependency on `symfony/string` for Unicode-aware case conversions and slugging.
+`wexample/php-helpers` is a PHP library of static utility classes covering string manipulation, array operations, PHP class and namespace reflection, filesystem path handling, and date format constants. It targets PHP developers — particularly those working in the Wexample ecosystem — who need reliable, framework-agnostic helpers without a heavy dependency chain. The library requires PHP ≥ 8.5 and has a single runtime dependency on `symfony/string` for Unicode-aware case conversions and slugging.
 
 ## Table of Contents
 
@@ -46,6 +46,7 @@ The helpers and what they own:
 | `ClassHelper` | Namespace and class-name math: `getShortName`, `getRealClassPath` (Doctrine proxy-aware), `getClassCousin`, attribute scanning via `ReflectionClass` / `ReflectionMethod`, getter/setter builders and callers. |
 | `DateHelper` | PHP `date()` format string constants only — no logic. |
 | `DirHelper` | `createDirRecursive`, `removeDirRecursive`, `listFiles` with a glob pattern. |
+| `EmojiHelper` | `convertEmoji(string)` — rewrites ASCII smileys into their emoji, from a fixed map of 146 spellings. |
 | `FileHelper` | File extension and path separator constants. `putContentsRecursive` (delegates directory creation to `DirHelper`). `scanDirectoryForFiles` with a `RecursiveDirectoryIterator`. |
 | `HttpHelper` | HTTP `Content-Type` string constants only — no logic. |
 | `LoremIpsumHelper` | `generate(int $length)` — assembles placeholder text from a fixed sentence pool, always starting with `"Lorem ipsum"`. |
