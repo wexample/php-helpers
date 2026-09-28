@@ -379,7 +379,7 @@ class ClassHelper
 
     public static function buildClassFilePath(
         string $className,
-        string $folder = null
+        ?string $folder = null
     ): string {
         $parts = explode(self::NAMESPACE_SEPARATOR, $className);
 
