@@ -574,7 +574,7 @@ class ClassHelper
         if (is_string($subjectPath)) {
             if (str_contains($subjectPath, ClassHelper::METHOD_SEPARATOR)) {
                 try {
-                    $reflexion = new ReflectionMethod($subjectPath);
+                    $reflexion = ReflectionMethod::createFromMethodName($subjectPath);
                 } catch (Exception) {
                     return [];
                 }
