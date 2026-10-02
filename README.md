@@ -1,6 +1,6 @@
 # php_helpers
 
-Version: 5.0.0
+Version: 6.0.0
 
 `wexample/php-helpers` is a PHP library of static utility classes covering string manipulation, array operations, PHP class and namespace reflection, filesystem path handling, and date format constants. It targets PHP developers — particularly those working in the Wexample ecosystem — who need reliable, framework-agnostic helpers without a heavy dependency chain. The library requires PHP ≥ 8.5 and has a single runtime dependency on `symfony/string` for Unicode-aware case conversions and slugging.
 
