@@ -5,6 +5,7 @@ namespace Wexample\Helpers\Helper;
 use function current;
 
 use Exception;
+use Transliterator;
 
 use function explode;
 use function floatval;
