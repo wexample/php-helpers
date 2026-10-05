@@ -5,7 +5,6 @@ namespace Wexample\Helpers\Helper;
 use function current;
 
 use Exception;
-use Transliterator;
 
 use function explode;
 use function floatval;
@@ -32,6 +31,7 @@ use function strtoupper;
 
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\String\UnicodeString;
+use Transliterator;
 
 class TextHelper
 {
