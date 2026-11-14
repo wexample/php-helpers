@@ -11,11 +11,13 @@ class ArrayHelper
      *
      * @param array $array The array to check.
      *
+     * An empty array is a list, so it is not associative.
+     *
      * @return bool True if associative, false if sequential.
      */
     public static function isAssociative(array $array): bool
     {
-        return array_keys($array) !== range(0, count($array) - 1);
+        return ! array_is_list($array);
     }
 
     /**
@@ -167,9 +169,7 @@ class ArrayHelper
         mixed $default = null,
         string $separator = self::PATH_SEPARATOR_DEFAULT
     ): mixed {
-        if (is_string($key)) {
-            $keys = explode($separator, $key);
-        }
+        $keys = is_string($key) ? explode($separator, $key) : $key;
 
         foreach ($keys as $k) {
             if (is_array($data) && array_key_exists($k, $data)) {
@@ -189,10 +189,14 @@ class ArrayHelper
         $result = [];
 
         foreach ($array as $key => $value) {
-            $newKey = $prefix ? $prefix . '.' . $key : $key;
+            // Compared to '' rather than tested for truthiness: a "0" prefix
+            // (the first item of a list) is a prefix like any other.
+            $newKey = '' !== $prefix ? $prefix . '.' . $key : $key;
 
             if (is_array($value)) {
-                $result = array_merge($result, static::flattenArray($value, $newKey));
+                // array_replace() rather than array_merge(): integer keys are
+                // keys, not positions to renumber.
+                $result = array_replace($result, static::flattenArray($value, (string) $newKey));
             } else {
                 $result[$newKey] = $value;
             }

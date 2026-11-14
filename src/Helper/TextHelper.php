@@ -13,22 +13,20 @@ use function implode;
 use function is_file;
 use function is_numeric;
 use function lcfirst;
-use function mt_srand;
-use function number_format;
 use function openssl_encrypt;
 use function ord;
 use function preg_replace;
 use function preg_split;
 use function random_int;
 use function round;
-use function rtrim;
 use function str_replace;
-use function str_shuffle;
 use function strip_tags;
 use function strlen;
 use function strtolower;
 use function strtoupper;
 
+use Random\Engine\Mt19937;
+use Random\Randomizer;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\String\UnicodeString;
 use Transliterator;
@@ -67,15 +65,21 @@ class TextHelper
 
     final public const TRIM_MARKER = '...';
 
+    /**
+     * Building a slugger or a transliterator compiles its rules: done once per
+     * process and reused, since both only depend on the code, never on a request.
+     */
+    private static ?AsciiSlugger $slugger = null;
+
+    private static ?Transliterator $accentsTransliterator = null;
+
     public static function removePrefix(
         string $string,
         string $prefix
     ): string {
-        return preg_replace(
-            '/^' . preg_quote($prefix, '/') . '/',
-            '',
-            $string
-        );
+        return str_starts_with($string, $prefix)
+            ? substr($string, strlen($prefix))
+            : $string;
     }
 
     public static function createAbstract(string $string): string
@@ -126,13 +130,13 @@ class TextHelper
      */
     public static function getLetterFromString(string $string): string
     {
-        mt_srand(1);
-        $string = strtolower(
-            preg_replace('/[^a-zA-Z]/', '', str_shuffle($string))[0]
-        );
-        mt_srand();
+        // A local engine seeded with 1 shuffles exactly as str_shuffle() did
+        // after mt_srand(1), so every string keeps the letter it had, without
+        // reseeding the generator the rest of the process draws from.
+        $shuffled = (new Randomizer(new Mt19937(1)))->shuffleBytes($string);
+        $letters = preg_replace('/[^a-zA-Z]/', '', $shuffled);
 
-        return $string;
+        return strtolower($letters[0] ?? '');
     }
 
     public static function camelToDash(string $string): string
@@ -143,31 +147,6 @@ class TextHelper
     public static function stringToKebab(string $string): string
     {
         return strtolower(preg_replace('/_/', '-', $string));
-    }
-
-    public static function getStringFromIntData(
-        int $data,
-        bool $trimZeros = false
-    ): string {
-        $decPoint = ',';
-        $decimals = 2;
-
-        $formatted = number_format(
-            NumberHelper::intDataToFloat($data),
-            $decimals,
-            $decPoint,
-            ' '
-        );
-
-        if ($trimZeros) {
-            for ($i = 0; $i < $decimals; ++$i) {
-                $formatted = rtrim($formatted, '0');
-            }
-
-            $formatted = rtrim($formatted, $decPoint);
-        }
-
-        return $formatted;
     }
 
     public static function uniqueFileNameInDir(
@@ -298,17 +277,22 @@ class TextHelper
 
     public static function slugify(string $string): string
     {
-        $slugger = new AsciiSlugger();
-
-        return $slugger->slug(strtolower($string));
+        return self::getSlugger()->slug(strtolower($string));
     }
 
     public static function removeAccents(?string $text): string
     {
-        return Transliterator::createFromRules(
+        self::$accentsTransliterator ??= Transliterator::createFromRules(
             ':: Any-Latin; :: Latin-ASCII; :: NFD; :: [:Nonspacing Mark:] Remove; :: Lower(); :: NFC;',
             Transliterator::FORWARD
-        )->transliterate($text);
+        );
+
+        return self::$accentsTransliterator->transliterate($text);
+    }
+
+    private static function getSlugger(): AsciiSlugger
+    {
+        return self::$slugger ??= new AsciiSlugger();
     }
 
     public static function usernameFromEmail(string $email): string
@@ -399,11 +383,10 @@ class TextHelper
         string $string,
         string $suffix
     ): string {
-        return preg_replace(
-            '/' . preg_quote($suffix, '/') . '$/',
-            '',
-            $string
-        );
+        // An empty suffix is guarded: substr($string, 0, -0) would empty the string.
+        return '' !== $suffix && str_ends_with($string, $suffix)
+            ? substr($string, 0, -strlen($suffix))
+            : $string;
     }
 
     public static function toKebab(string $string): string
@@ -425,8 +408,7 @@ class TextHelper
         ?string $name = ''
     ): string {
         if ($name) {
-            $slugger = new AsciiSlugger();
-            $name = $slugger->slug($name, ' ');
+            $name = self::getSlugger()->slug($name, ' ');
         }
 
         return $name . ' <' . $mail . '>';
@@ -584,33 +566,24 @@ class TextHelper
         return implode($separator, $binary);
     }
 
-    public static function binaryToString(
-        string $binary,
-        string $separator = ' '
-    ): mixed {
-        $binaries = explode($separator, $binary);
-
-        $string = null;
-        foreach ($binaries as $binary) {
-            $string .= pack('H*', dechex(bindec($binary)));
-        }
-
-        if (JsonHelper::isJson($string)) {
-            return json_decode($string);
-        }
-
-        return $string;
-    }
-
     /**
+     * Returns null when the bundle is malformed or the password is wrong.
+     *
      * @see https://gist.github.com/nim4n136/7fa38467181130f5a2270c39d495101e
      */
     public static function decrypt(
         string $msgEncryptedBundle,
         string $password
-    ): string {
+    ): ?string {
         $password = sha1($password);
         $components = explode(':', $msgEncryptedBundle);
+
+        // The IV is 16 characters long: anything else is not a bundle
+        // encrypt() made, and openssl would only pad it with a warning.
+        if (3 !== count($components) || 16 !== strlen($components[0])) {
+            return null;
+        }
+
         $iv = $components[0];
         $salt = hash('sha256', $password . $components[1]);
         $encryptedMsg = $components[2];
@@ -623,7 +596,7 @@ class TextHelper
         );
 
         if (false === $decryptedMsg) {
-            return false;
+            return null;
         }
 
         return $decryptedMsg;
@@ -649,9 +622,12 @@ class TextHelper
         string $string,
         string $password
     ): string {
-        $iv = substr(sha1(mt_rand()), 0, 16);
+        // Same shape as before (16 then 40 hex characters, never a ":"), so
+        // bundles already stored still decrypt, but drawn from a CSPRNG:
+        // mt_rand() is predictable and would make the IV and salt guessable.
+        $iv = bin2hex(random_bytes(8));
         $password = sha1($password);
-        $salt = sha1(mt_rand());
+        $salt = bin2hex(random_bytes(20));
         $saltWithPassword = hash('sha256', $password . $salt);
 
         $encrypted = openssl_encrypt(

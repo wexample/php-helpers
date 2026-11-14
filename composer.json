@@ -22,5 +22,10 @@
     "psr-4": {
       "Wexample\\Helpers\\": "src/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Wexample\\Helpers\\Tests\\": "tests/"
+    }
   }
 }

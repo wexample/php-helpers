@@ -16,7 +16,8 @@ trait HasShortClassNameClassTrait
     {
         $shortName = ClassHelper::getShortName(static::class);
 
-        if ($suffix = self::getClassNameSuffix()) {
+        // static:: so a class using the trait can declare its own suffix.
+        if ($suffix = static::getClassNameSuffix()) {
             return TextHelper::removeSuffix($shortName, $suffix);
         }
 

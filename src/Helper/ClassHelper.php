@@ -98,6 +98,21 @@ class ClassHelper
         ClassHelper::CLASS_TEST_BASE_PATH => ClassHelper::DIR_TESTS,
     ];
 
+    /**
+     * Above this many field names, accessor names are no longer remembered:
+     * field names may come from submitted data, and a long-lived worker must
+     * not grow a memo for every key a client sends.
+     */
+    private const int ACCESSOR_NAMES_MEMO_LIMIT = 1024;
+
+    /**
+     * Accessor names already built, by prefix then field name. A pure string
+     * transform of the field name, so it holds for the whole process.
+     *
+     * @var array<string, array<string, string>>
+     */
+    private static array $accessorNames = [];
+
     public static function getKebabName($className): string
     {
         return str_replace(
@@ -116,19 +131,13 @@ class ClassHelper
     {
         $className = ClassHelper::getRealClassPath($className);
 
-        if (class_exists($className)) {
-            try {
-                $reflexion = new ReflectionClass($className);
+        // The short name is what follows the last separator: cutting the string
+        // gives what a reflection would, without building one on every call.
+        $position = strrpos($className, ClassHelper::NAMESPACE_SEPARATOR);
 
-                return $reflexion->getShortName();
-            } catch (Exception) {
-            }
-        }
-
-        return TextHelper::getLastChunk(
-            $className,
-            ClassHelper::NAMESPACE_SEPARATOR,
-        );
+        return false === $position
+            ? $className
+            : substr($className, $position + 1);
     }
 
     /**
@@ -236,12 +245,29 @@ class ClassHelper
 
     public static function buildFieldSetterName(string $fieldName): string
     {
-        return 'set' . TextHelper::toClass($fieldName);
+        return self::buildAccessorName('set', $fieldName);
     }
 
     public static function buildFieldGetterName(string $fieldName): string
     {
-        return 'get' . TextHelper::toClass($fieldName);
+        return self::buildAccessorName('get', $fieldName);
+    }
+
+    private static function buildAccessorName(
+        string $prefix,
+        string $fieldName
+    ): string {
+        if (isset(self::$accessorNames[$prefix][$fieldName])) {
+            return self::$accessorNames[$prefix][$fieldName];
+        }
+
+        $name = $prefix . TextHelper::toClass($fieldName);
+
+        if (count(self::$accessorNames[$prefix] ?? []) < self::ACCESSOR_NAMES_MEMO_LIMIT) {
+            self::$accessorNames[$prefix][$fieldName] = $name;
+        }
+
+        return $name;
     }
 
     public static function hasFieldSetter(
@@ -310,24 +336,22 @@ class ClassHelper
         string $fieldName,
         mixed $default = null
     ): mixed {
-        $method = self::buildFieldGetterName($fieldName);
-
+        // A class, existing or not, has no value to read: the default it is.
         if (is_string($object)) {
-            if (! class_exists($object)) {
-                return $default;
-            }
-
-            if (! method_exists($object, $method)) {
-                return $default;
-            }
-
-            return null;
+            return $default;
         }
+
+        $method = self::buildFieldGetterName($fieldName);
 
         if (! method_exists($object, $method)) {
             return $default;
         }
 
+        // Kept as wide as Throwable on purpose: what makes a getter fail here is
+        // as often an Error (a typed property not yet initialized, a null
+        // returned against the declared type) as an Exception (a Doctrine proxy
+        // whose row is gone), and callers ask for a default precisely so that
+        // one unreadable field does not break the listing it belongs to.
         try {
             return $object->$method();
         } catch (\Throwable) {

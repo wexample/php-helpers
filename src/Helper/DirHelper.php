@@ -20,13 +20,11 @@ class DirHelper
         string $path,
         int $mode = 0755
     ): bool {
-        if (is_dir($path)) {
-            // The directory already exists.
-            return true;
-        }
-
-        // Try to create the directory recursively.
-        if (! mkdir($path, $mode, true)) {
+        // Checked again after a failed mkdir(): another process (a parallel
+        // worker, a concurrent test) may have created it in between, which is
+        // the outcome wanted, not a failure. The warning mkdir() raises in that
+        // case is silenced so it does not turn into an exception on its own.
+        if (! is_dir($path) && ! @mkdir($path, $mode, true) && ! is_dir($path)) {
             throw new \RuntimeException("Failed to create directory: " . $path);
         }
 
