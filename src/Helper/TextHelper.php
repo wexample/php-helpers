@@ -17,6 +17,10 @@ use function openssl_encrypt;
 use function ord;
 use function preg_replace;
 use function preg_split;
+
+use Random\Engine\Mt19937;
+use Random\Randomizer;
+
 use function random_int;
 use function round;
 use function str_replace;
@@ -25,8 +29,6 @@ use function strlen;
 use function strtolower;
 use function strtoupper;
 
-use Random\Engine\Mt19937;
-use Random\Randomizer;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\String\UnicodeString;
 use Transliterator;
