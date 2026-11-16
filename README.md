@@ -1,6 +1,6 @@
 # php_helpers
 
-Version: 7.0.4
+Version: 8.0.0
 
 Various helpers
 
